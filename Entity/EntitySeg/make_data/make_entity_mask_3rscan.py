@@ -203,16 +203,36 @@ def get_nyu40_labels():
 'otherprop',
 ]
 
+import argparse
+
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--folder','-f', type=str, 
+                    default='/media/sc/SSD1TB/dataset/3RScan', 
+                    help='directroy to 3RScan', required=True)
+parser.add_argument('--mode','-m', type=str, choices=['train','val'],
+                    default='train', 
+                    help='mode. can be trian or val', required=True)
+parser.add_argument('--folder','-f', type=str, 
+                    default='/media/sc/SSD1TB/dataset/3RScan/', 
+                    help='directroy to 3RScan', required=True)
+parser.add_argument('--output','-o', type=str, 
+                    default='/media/sc/SSD1TB/dataset/entity_3rscan/', 
+                    help='directroy to 3RScan', required=True)
+parser.add_argument('--mapping', type=str, 
+                    default='../data/3RScan.v2 Semantic Classes - Mapping.csv', 
+                    help='directroy to 3RScan', required=True)
+args = parser.parse_args()
+
 
 # thread_num   = int(sys.argv[1])
 # thread_idx   = int(sys.argv[2])
 # type_        = sys.argv[3]
 
-prefix = "train"
-prefix = "val"
-path_3rscan = '/media/sc/SSD1TB/dataset/3RScan'
-path_label_mapping = '/home/sc/research/Entity/Entity/EntitySeg/data/3RScan.v2 Semantic Classes - Mapping.csv'
-pth_out = '/media/sc/SSD1TB/dataset/entity_3rscan'
+prefix = args.mode# "train"
+# prefix = "val"
+path_3rscan = args.folder#'/media/sc/SSD1TB/dataset/3RScan'
+path_label_mapping = args.mapping#'/home/sc/research/Entity/Entity/EntitySeg/data/3RScan.v2 Semantic Classes - Mapping.csv'
+pth_out = args.output# '/media/sc/SSD1TB/dataset/entity_3rscan'
 
 path_data = os.path.join(path_3rscan, 'data/3RScan')
 path_split = os.path.join(path_3rscan,'splits')
