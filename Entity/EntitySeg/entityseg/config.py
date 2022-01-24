@@ -4,6 +4,10 @@ def add_entity_config(cfg):
     """
     Add config for Item.
     """
+    ## Add freeze
+    cfg.MODEL.BACKBONE.FIX = False
+    cfg.MODEL.FPN.FIX = False
+    
     ## FCOS Hyper-Parameters
     cfg.MODEL.FCOS = CN()
 

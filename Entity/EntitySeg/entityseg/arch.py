@@ -39,6 +39,11 @@ class EntityFPN(nn.Module):
         self.backbone  = build_backbone(cfg)
         backbone_shape = self.backbone.output_shape()
         self.det_head  = build_det_head(cfg, backbone_shape)
+        
+        if cfg.MODEL.BACKBONE.FIX:
+            for param in self.backbone.parameters(): param.requires_grad = False
+        if cfg.MODEL.FPN.FIX:
+            for param in self.det_head.parameters(): param.requires_grad = False
 
         ## mask
         self.mask_head = build_dynamic_mask_head(cfg)

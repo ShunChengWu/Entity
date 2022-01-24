@@ -25,7 +25,7 @@ type_        = sys.argv[3]
 
 OFFSET = 256 * 256 * 256
 
-GT_base_path             = "/data/ceph/gavinqi/data/coco"
+GT_base_path             = "/media/sc/SSD1TB/dataset/coco"
 GT_panoptic_png_path     = os.path.join(GT_base_path, "panoptic_{}".format(type_))
 GT_panoptic_json_path    = os.path.join(GT_base_path, "annotations/panoptic_{}.json".format(type_))
 GT_instance_json_path    = os.path.join(GT_base_path, "annotations/instances_{}.json".format(type_))
@@ -89,7 +89,7 @@ for img_index, (img_dict, ann_dict_list) in enumerate(imgs_instancesanns):
         old_entity_id     = segment_info["id"]
         new_entity_id     = ii + 1
         category          = segment_info["category_id"]
-        panoptic_entity_id[panoptic_id==old_entity_id] = new_entity_id
+        panoptic_entity_id[panoptic_id==old_entity_id] = new_entity_id # replace all id into a uniqe one for later.
         panoptic_class_id[panoptic_id==old_entity_id]  = catid_map[category][0]
     
     unique_ids        = np.unique(panoptic_entity_id)

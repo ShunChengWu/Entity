@@ -12,7 +12,8 @@ from collections import OrderedDict
 import pycocotools.mask as mask_util
 import torch
 from fvcore.common.file_io import PathManager
-from pycocotools.coco import COCO
+# from pycocotools.coco import COCO
+from modified_cocoapi.PythonAPI.pycocotools.coco import COCO
 from tabulate import tabulate
 
 import detectron2.utils.comm as comm

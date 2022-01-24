@@ -1,0 +1,1 @@
+python demo_result_and_vis.py --config-file configs/entity_r50_1x_3rscan.yaml --input /media/sc/SSD1TB/dataset/3RScan/data/3RScan/4acaebcc-6c10-2a2a-858b-29c7e4fb410d/sequence/frame-*[0-9].color.jpg --output data/output/ MODEL.WEIGHTS output/r50_1x_3rscan/model_0048999.pth MODEL.CONDINST.MASK_BRANCH.USE_MASK_RESCORE "True"

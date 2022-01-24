@@ -88,6 +88,18 @@ def get_parser():
         default=0.2,
         help="Minimum score for instance predictions to be shown",
     )
+    parser.add_argument(
+        "--rotate",
+        type=int,
+        default=3,
+        help="How many times the input image should be rotated (np.rot90). ",
+    )
+    parser.add_argument(
+        "--rotate-out",
+        type=int,
+        default=0,
+        help="How many times the output image should be rotated (np.rot90). ",
+    )
 
     parser.add_argument(
         "opts",
@@ -97,9 +109,24 @@ def get_parser():
         default=None,
         nargs=argparse.REMAINDER,
     )
+    parser.add_argument("--save-npy", action="store_true", help="save output to npy")
+    parser.add_argument("--save-jpg", action="store_true", help="save output to jpg")
     return parser
 
+import re
 
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+    '''
+    alist.sort(key=natural_keys) sorts in human order
+    http://nedbatchelder.com/blog/200712/human_sorting.html
+    (See Toothy's implementation in the comments)
+    '''
+    return [ atoi(c) for c in re.split(r'(\d+)', text) ]
+
+import sys
 if __name__ == "__main__":
     mp.set_start_method("spawn", force=True)
     args = get_parser().parse_args()
@@ -111,17 +138,29 @@ if __name__ == "__main__":
         os.makedirs(args.output)
 
     cfg = setup_cfg(args)
+    
+    # print(len(args.input))
+    # sys.exit()
+    
 
     demo = VisualizationDemo(cfg)
     colors = make_colors()
 
     if args.input:
         if len(args.input) == 1:
-            args.input = glob.glob(os.path.expanduser(args.input[0]))
+            files = glob.glob(os.path.expanduser(args.input[0]))
+            # files.sort(key = natural_keys)
+            args.input = files
             assert args.input, "The input path(s) was not found"
-        for path in tqdm.tqdm(args.input, disable=not args.output):
+            # print('sort')
+        args.input.sort(key = natural_keys)
+        # sys.exit()
+        pbar = tqdm.tqdm(args.input, disable=not args.output)
+        for path in pbar:
+            pbar.set_description("Processing %s" % path)
             # use PIL, to be consistent with evaluation
             img = read_image(path, format="BGR")
+            img = np.rot90(img,args.rotate)
             start_time = time.time()
             data = demo.run_on_image_wo_vis(img)
             logger.info(
@@ -139,28 +178,33 @@ if __name__ == "__main__":
                 assert len(args.input) == 1, "Please specify a directory with args.output"
                 out_filename = args.output
             ## save inference result, [0] original score by detection head, [1] mask rescoring score, [2] mask_id
-            ori_scores = data[0]
-            scores = data[1]
-            mask_id = data[2]
-            np.savez(out_filename.split(".")[0]+".npz", ori_scores=ori_scores, scores=scores, mask_id=mask_id)
+            if args.save_npy:
+                data[2] = np.rot90(data[2],args.rotate_out)
+                
+                ori_scores = data[0]
+                scores = data[1]
+                mask_id = data[2]
+                np.savez(out_filename.split(".")[0]+".npz", ori_scores=ori_scores, scores=scores, mask_id=mask_id)
 
             ## save visualization
-            img_for_paste = copy.deepcopy(img)
-            color_mask     = copy.deepcopy(img)
-            masks_edge     = np.zeros(img.shape[:2], dtype=np.uint8)
-            alpha  = 0.4
-            count  = 0
-            for index, score in enumerate(scores):
-                if score <= args.confidence_threshold:
-                    break
-                color_mask[mask_id==count] = colors[count]
-                boundary = mask_to_boundary((mask_id==count).astype(np.uint8))
-                masks_edge[boundary>0] = 1
-                count += 1
-            img_wm = cv2.addWeighted(img_for_paste, alpha, color_mask, 1-alpha, 0)
-            img_wm[masks_edge==1] = 0
-            fvis = np.concatenate((img, img_wm))
-            cv2.imwrite(out_filename.split(".")[0]+".jpg",fvis)
+            if args.save_jpg:
+                img = np.rot90(img,args.rotate_out)
+                img_for_paste = copy.deepcopy(img)
+                color_mask     = copy.deepcopy(img)
+                masks_edge     = np.zeros(img.shape[:2], dtype=np.uint8)
+                alpha  = 0.4
+                count  = 0
+                for index, score in enumerate(scores):
+                    if score <= args.confidence_threshold:
+                        break
+                    color_mask[mask_id==count] = colors[count]
+                    boundary = mask_to_boundary((mask_id==count).astype(np.uint8))
+                    masks_edge[boundary>0] = 1
+                    count += 1
+                img_wm = cv2.addWeighted(img_for_paste, alpha, color_mask, 1-alpha, 0)
+                img_wm[masks_edge==1] = 0
+                fvis = np.concatenate((img, img_wm))
+                cv2.imwrite(out_filename.split(".")[0]+".jpg",fvis)
 
 
 

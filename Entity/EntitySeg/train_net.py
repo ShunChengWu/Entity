@@ -10,9 +10,9 @@ from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.data import build_detection_test_loader, build_detection_train_loader
 from detectron2.config import get_cfg
 from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, launch
-from detectron2.evaluation import COCOEvaluator, verify_results, DatasetEvaluators, COCOEvaluator_ClassAgnostic
+from detectron2.evaluation import COCOEvaluator, verify_results, DatasetEvaluators#, COCOEvaluator_ClassAgnostic
 # from entityseg import *
-from entityseg import COCOEvaluator_ClassAgnostic, add_entity_config, DatasetMapper
+from entityseg import COCOEvaluator_ClassAgnostic, add_entity_config, DatasetMapper, DatasetMapper_3RScan
 
 os.environ["NCCL_LL_THRESHOLD"] = "0"
 class Trainer(DefaultTrainer):
@@ -29,15 +29,17 @@ class Trainer(DefaultTrainer):
     def build_train_loader(cls, cfg):
         """
         """
-        mapper = DatasetMapper(cfg, True)
+        mapper = DatasetMapper_3RScan(cfg, True)
         return build_detection_train_loader(cfg, mapper)
+        # return build_detection_train_loader(cfg, mapper,num_workers=0)
 
     @classmethod
     def build_test_loader(cls, cfg, dataset_name):
         """
         """
-        mapper = DatasetMapper(cfg, False)
+        mapper = DatasetMapper_3RScan(cfg, False)
         return build_detection_test_loader(cfg, dataset_name, mapper)
+        # return build_detection_test_loader(cfg, dataset_name, mapper,num_workers=0)
 
 def setup(args):
     """
