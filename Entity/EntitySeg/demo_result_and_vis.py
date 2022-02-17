@@ -178,12 +178,11 @@ if __name__ == "__main__":
                 assert len(args.input) == 1, "Please specify a directory with args.output"
                 out_filename = args.output
             ## save inference result, [0] original score by detection head, [1] mask rescoring score, [2] mask_id
+            data[2] = np.rot90(data[2],args.rotate_out)
+            ori_scores = data[0]
+            scores = data[1]
+            mask_id = data[2]
             if args.save_npy:
-                data[2] = np.rot90(data[2],args.rotate_out)
-                
-                ori_scores = data[0]
-                scores = data[1]
-                mask_id = data[2]
                 np.savez(out_filename.split(".")[0]+".npz", ori_scores=ori_scores, scores=scores, mask_id=mask_id)
 
             ## save visualization

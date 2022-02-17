@@ -22,7 +22,7 @@ This file contains the default mapping that's applied to "dataset dicts".
 """
 
 __all__ = ["DatasetMapper"]
-
+_root = os.getenv("DETECTRON2_DATASETS", "/mnt/d/dataset/")
 
 def filter_empty_instances(instances, by_box=True, by_mask=True, box_threshold=1e-5):
     """
@@ -293,7 +293,7 @@ class DatasetMapper_3RScan:
         sequence_id = dataset_dict["file_name"].split('/')[-3]
         name  = dataset_dict["file_name"].split("/")[-1].split(".")[0].split('-')[1]
         
-        panoptic_annotation_path = os.path.join("/media/sc/SSD1TB/dataset/entity_3rscan/", 'train' if self.is_train else 'val',
+        panoptic_annotation_path = os.path.join(_root,"entity_3rscan/", 'train' if self.is_train else 'val',
                                                 # sequence_id,
                                                 '{0:06d}'.format(dataset_dict['image_id'])+'.npz')
         # if self.is_train:

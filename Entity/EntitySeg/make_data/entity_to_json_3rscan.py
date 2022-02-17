@@ -16,9 +16,6 @@ parser.add_argument('--folder','-f', type=str,
 parser.add_argument('--mode','-m', type=str, choices=['train','val'],
                     default='train', 
                     help='mode. can be trian or val', required=True)
-parser.add_argument('--folder','-f', type=str, 
-                    default='/media/sc/SSD1TB/dataset/3RScan/', 
-                    help='directroy to 3RScan', required=True)
 parser.add_argument('--output','-o', type=str, 
                     default='/media/sc/SSD1TB/dataset/entity_3rscan/', 
                     help='directroy to 3RScan', required=True)

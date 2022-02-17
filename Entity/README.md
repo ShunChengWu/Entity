@@ -19,20 +19,53 @@ This project is based on [Detectron2](https://github.com/facebookresearch/detect
 * Copy this project to `/path/to/detectron2/projects/EntitySeg`
 * Set the "find_unused_parameters=True" in distributed training of your own detectron2. You could modify it in detectron2/engine/defaults.py.
 
+### Dependencies
+```
+conda install -c conda-forge opencv
+conda install -c conda-forge timm
+pip install scikit-image
+pip install mmcv
+pip install git+https://github.com/cocodataset/panopticapi.git
+#pip install setuptools==59.5.0
+
+```
+Render 3rscan images
+```
+sudo apt-get install libeigen3-dev
+sudo apt install libglew-dev
+sudo apt install libglm-dev
+git clone git@github.com:WaldJohannaU/3RScan.git
+cd 3RScan/c++
+mkdir build; cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j8
+# go back to make_data
+bash gen_rendered_image.sh
+```
+
+
 ## Data pre-processing
 (1) Generate the entity information of each image by the instance and panoptic annotation. Please change the path of coco annotation files in the following code.
 ```bash
 cd /path/to/detectron2/projects/EntitySeg/make_data
 bash make_entity_mask.sh
+
+# for 3RScan
+python make_entity_mask_3rscan.py -f /mnt/d/dataset/3RScan/ -m train -o /mnt/d/dataset/entity_3rscan -l ../files/full_list.txt
 ```
 (2) Change the generated entity information to the json files.
 ```bash
 cd /path/to/detectron2/projects/EntitySeg/make_data
 python3 entity_to_json.py
+# for 3RScan
+python3 entity_to_json_3rscan.py 
 ```
 
-
 ## Training
+```
+export DETECTRON2_DATASETS="/mnt/d/dataset/"
+```
+
 To train model with 8 GPUs, run:
 ```bash
 cd /path/to/detectron2
@@ -44,6 +77,12 @@ one should execute:
 ```bash
 cd /path/to/detectron2
 python3 projects/EntitySeg/train_net.py --config-file projects/EntitySeg/configs/entity_default.yaml --num-gpus 8 OUTPUT_DIR /data/entity_model
+```
+
+## Resume
+The system will try to load last_checkpoint file.
+```
+python3 projects/EntitySeg/train_net.py --config-file projects/EntitySeg/configs/entity_default.yaml --resume
 ```
 
 ## Evaluation

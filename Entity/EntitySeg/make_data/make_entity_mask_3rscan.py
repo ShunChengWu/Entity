@@ -212,15 +212,15 @@ parser.add_argument('--folder','-f', type=str,
 parser.add_argument('--mode','-m', type=str, choices=['train','val'],
                     default='train', 
                     help='mode. can be trian or val', required=True)
-parser.add_argument('--folder','-f', type=str, 
-                    default='/media/sc/SSD1TB/dataset/3RScan/', 
-                    help='directroy to 3RScan', required=True)
 parser.add_argument('--output','-o', type=str, 
                     default='/media/sc/SSD1TB/dataset/entity_3rscan/', 
                     help='directroy to 3RScan', required=True)
 parser.add_argument('--mapping', type=str, 
                     default='../data/3RScan.v2 Semantic Classes - Mapping.csv', 
-                    help='directroy to 3RScan', required=True)
+                    help='directroy to 3RScan', required=False)
+parser.add_argument('--list','-l', type=str, 
+                    default='', 
+                    help='the list of scan ids to be processed', required=True)
 args = parser.parse_args()
 
 
@@ -245,8 +245,12 @@ nyu40_labels = get_nyu40_labels()
 
 # train_list = loadtext(os.path.join(path_split,'train.txt'))
 # val_list = loadtext(os.path.join(path_split,'val.txt'))
-full_list = loadtext(os.path.join(path_split,prefix+'.txt')) #train_list+val_list
+# full_list = loadtext(os.path.join(path_split,prefix+'.txt')) #train_list+val_list
+full_list = loadtext(args.list)
+# print(os.path.join(path_split,prefix+'.txt'))
 print('num of scans:',len(full_list))
+if(len(full_list)==0):
+    raise RuntimeError('no scans')
 #import sys
 #sys.exit()
 _, label_name_mapping, _ = getLabelMapping('nyu40',path_label_mapping)
