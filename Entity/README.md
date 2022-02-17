@@ -39,8 +39,24 @@ cd 3RScan/c++
 mkdir build; cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j8
-# go back to make_data
-bash gen_rendered_image.sh
+```
+Then create a bash script with
+```
+for d in /mnt/d/dataset/3RScan/data/3RScan/*/; do
+ #echo "$d"
+ f="$(basename -- $d)"
+ b="$(dirname $d)"
+ ./rio_renderer_render_all $b $f "sequence" "1"
+done
+```
+Change the path to your 3RScan path
+
+
+Then Run
+```
+bash Run_all.sh
+```
+
 ```
 
 
